@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Propridict – India's premium land and property price predictor. Get AI-driven price projections, EMI calculators, bank offer comparisons, stamp duty estimates, and interactive maps across 25+ major Indian cities."/>
+  <meta name="keywords" content="land price prediction, property rates India, real estate predictor, EMI calculator, stamp duty calculator, bank home loan offers"/>
+  <meta name="author" content="Propridict"/>
+  <title>Propridict – Premium Land Price Predictor | India's Smart Property Tool</title>
+
+  <!-- Favicon (inline SVG data URI) -->
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%234361ee"/><text x="50%25" y="54%25" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="%23ffffff">P</text></svg>'>
+
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <!-- Brand Header -->
+  <header class="brand-bar" aria-label="Brand header">
+    <div class="brand-wrap">
+      <a class="brand" href="#inputCard" aria-label="Go to Predictor">
+        <!-- Inline Propridict logo (SVG) -->
+        <svg class="brand-logo" viewBox="0 0 180 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Propridict logo">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#4361ee"/>
+              <stop offset="100%" stop-color="#3f37c9"/>
+            </linearGradient>
+          </defs>
+          <!-- Mark -->
+          <g>
+            <rect x="0" y="2" width="36" height="36" rx="8" fill="url(#g)"/>
+            <text x="18" y="27" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#fff" font-weight="800">P</text>
+          </g>
+          <!-- Wordmark -->
+          <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text','Helvetica Neue','Segoe UI',Roboto,Arial,sans-serif" font-size="20" fill="currentColor" font-weight="800" letter-spacing="-0.02em">Propridict</text>
+        </svg>
+        <span class="brand-name" style="display:none;">Propridict</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#inputCard"><i class="fas fa-calculator"></i> Predict</a>
+        <a href="#leafletMap"><i class="fas fa-map"></i> Map</a>
+        <a href="#offersCard"><i class="fas fa-university"></i> Offers</a>
+        <a href="#dashboardCard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a href="#contactCard"><i class="fas fa-handshake"></i> Contact</a>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+          <i class="fas fa-moon"></i> <span id="themeLabel">Dark</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Parallax 1 (Top Hero) -->
+  <section class="parallax" style="background-image:url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2000&auto=format&fit=crop');">
+    <!-- Optional logo in hero -->
+    <div class="hero-logo">
+      <svg class="logo" viewBox="0 0 180 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="gh" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#4361ee"/><stop offset="100%" stop-color="#3f37c9"/></linearGradient></defs>
+        <rect x="0" y="2" width="36" height="36" rx="8" fill="url(#gh)"/><text x="18" y="27" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#fff" font-weight="800">P</text>
+        <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont,'SF Pro Text','Helvetica Neue','Segoe UI',Roboto,Arial,sans-serif" font-size="20" fill="#fff" font-weight="800" letter-spacing="-0.02em">Propridict</text>
+      </svg>
+    </div>
+    <div class="p-content">
+      <h1>Premium Land Price Predictor</h1>
+      <p>Map integration • Premium factors • EMI • Trend chart • Bank offers • Duty calculator</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap: wrap;">
+        <a href="#inputCard"><button class="p-cta primary"><i class="fas fa-play"></i> Start Prediction</button></a>
+        <a href="#leafletMap"><button class="p-cta secondary"><i class="fas fa-map"></i> View Map</button></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrapper" id="app">
+    <!-- Input -->
+    <section id="inputCard" class="card">
+      <h1 class="app-title"><i class="fas fa-map-marker-alt"></i> Land Price Predictor</h1>
+      <p class="subtitle">Enter property details to get a price projection</p>
+
+      <form id="predictionForm" autocomplete="off">
+        <div class="grid">
+          <div>
+            <label for="city"><i class="fas fa-city"></i> City</label>
+            <select id="city" required>
+              <option value="">Select a city</option>
+            </select>
+          </div>
+          <div>
+            <label for="landmark"><i class="fas fa-building"></i> Landmark/Area</label>
+            <select id="landmark" required disabled>
+              <option value="">Select city first</option>
+            </select>
+          </div>
+          <div>
+            <label for="category"><i class="fas fa-tags"></i> Property Category</label>
+            <select id="category" required disabled>
+              <option value="">Select landmark first</option>
+            </select>
+          </div>
+          <div>
+            <label for="size"><i class="fas fa-area-chart"></i> Size (sq. ft)</label>
+            <input id="size" type="number" min="100" max="1000000" value="1500" required />
+          </div>
+          <div>
+            <label for="year"><i class="fas fa-calendar"></i> Prediction Year</label>
+            <input id="year" type="number" min="2025" max="2050" value="2028" required />
+          </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-star"></i> Premium Factors</div>
+        <div class="row">
+          <div>
+            <label for="roadWidth">Road Width (ft)</label>
+            <input id="roadWidth" type="number" min="0" max="200" value="30" />
+          </div>
+          <div>
+            <label for="frontage">Frontage (ft)</label>
+            <input id="frontage" type="number" min="0" max="300" value="35" />
+          </div>
+          <div>
+            <label for="cornerPlot">Corner Plot</label>
+            <select id="cornerPlot">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <button class="cta" type="submit"><i class="fas fa-calculator"></i> Predict Price</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- Parallax 2 -->
+  <section class="parallax" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop');">
+    <div class="p-content">
+      <h1>Explore Market Hotspots</h1>
+      <p>See location impact via the interactive map and premium factors.</p>
+      <a href="#leafletMap"><button class="p-cta primary"><i class="fas fa-location-dot"></i> Go to Map</button></a>
+    </div>
+  </section>
+
+  <div class="wrapper">
+    <!-- Map -->
+    <section id="mapCard" class="card">
+      <div id="leafletMap" aria-label="Map"></div>
+    </section>
+
+    <!-- Results -->
+    <section id="resultsCard" class="card">
+      <h2><i class="fas fa-chart-line"></i> Prediction Results</h2>
+      <div id="priceResult"></div>
+      <div id="rateResult" class="muted"></div>
+      <div class="pill" id="premiumBadge">Premium factor: x1.00</div>
+      <div class="section-title">Rate Trend</div>
+      <div id="priceGraph"></div>
+
+      <div class="section-title"><i class="fas fa-receipt"></i> Price Breakdown</div>
+      <div id="breakdown" class="muted"></div>
+
+      <div class="section-title"><i class="fas fa-landmark"></i> Loan / EMI Calculator</div>
+      <div class="inline">
+        <div>
+          <label for="interest">Interest Rate (% p.a.)</label>
+          <input id="interest" type="number" step="0.1" min="0" max="30" value="8.5"/>
+        </div>
+        <div>
+          <label for="tenure">Tenure (years)</label>
+          <input id="tenure" type="number" min="1" max="40" value="20"/>
+        </div>
+        <div>
+          <label for="downPct">Down Payment (% of price)</label>
+          <input id="downPct" type="number" step="0.5" min="0" max="100" value="20"/>
+        </div>
+      </div>
+      <div id="emiSummary" class="muted" style="margin-top:8px;"></div>
+    </section>
+  </div>
+
+  <!-- Duty Calculator -->
+  <div class="wrapper">
+    <section id="dutyCard" class="card">
+      <h2><i class="fas fa-file-invoice"></i> Stamp Duty & Registration (Indicative)</h2>
+      <p class="muted" style="margin-top:-4px;">Calculated on property value. Rates vary by state, owner type, and policy changes. Please verify locally.</p>
+      <div class="duty-grid">
+        <div>
+          <div class="row">
+            <div>
+              <label for="dutyState">State</label>
+              <select id="dutyState"></select>
+            </div>
+            <div>
+              <label for="dutyOwner">Owner Type</label>
+              <select id="dutyOwner">
+                <option>Male</option>
+                <option>Female</option>
+                <option>Joint</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="dutyUsePred">Use Predicted Price</label>
+              <select id="dutyUsePred">
+                <option value="yes" selected>Yes</option>
+                <option value="no">No (Enter custom value)</option>
+              </select>
+            </div>
+            <div>
+              <label for="dutyValue">Custom Property Value (₹)</label>
+              <input id="dutyValue" type="number" min="0" step="1" placeholder="e.g., 7500000" disabled>
+            </div>
+          </div>
+          <button id="dutyCalcBtn" class="cta" type="button"><i class="fas fa-calculator"></i> Calculate Duty</button>
+        </div>
+        <div class="duty-summary" id="dutySummary">
+          <div class="muted">Select state and owner type, then calculate.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="wrapper">
+    <section id="dashboardCard" class="card">
+      <h2><i class="fas fa-chart-pie"></i> Summary Dashboard</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Predicted Price</div><div class="v" id="kpiPrice">—</div></div>
+        <div class="kpi"><div class="k">Adjusted Rate (/sq ft)</div><div class="v" id="kpiRate">—</div></div>
+        <div class="kpi"><div class="k">Stamp + Reg Fees</div><div class="v" id="kpiDuty">—</div></div>
+        <div class="kpi"><div class="k">Loan Principal</div><div class="v" id="kpiPrincipal">—</div></div>
+        <div class="kpi"><div class="k">Monthly EMI</div><div class="v" id="kpiEMI">—</div></div>
+        <div class="kpi"><div class="k">Cheapest Bank EMI</div><div class="v" id="kpiBestOffer">—</div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Parallax between Results and Offers -->
+  <section class="parallax" style="background-image:url('https://pixabay.com/get/g84401295afef8a6fd10a7b41eff05432bb071d8f4a5f2e1e4478a43dd5f1088c319d4a527b45841aa7cb99cbd5d2e57e_1920.jpg?longlived=');">
+    <div class="p-content">
+      <h1>Compare Bank Offers</h1>
+      <p>Find the best interest rate, EMI, and fees for your budget.</p>
+      <a href="#offersCard"><button class="p-cta primary"><i class="fas fa-university"></i> View Offers</button></a>
+    </div>
+  </section>
+
+  <div class="wrapper">
+    <!-- Bank Offers (always visible) -->
+    <section id="offersCard" class="card">
+      <h2><i class="fas fa-university"></i> Bank Offers For You</h2>
+      <div class="offers-grid">
+        <div>
+          <label for="offerType">Loan Type</label>
+          <select id="offerType">
+            <option value="Home Loan" selected>Home Loan</option>
+            <option value="LAP">Loan Against Property</option>
+          </select>
+        </div>
+        <div>
+          <label for="offerCustomer">Customer Type</label>
+          <select id="offerCustomer">
+            <option value="All" selected>All</option>
+            <option value="Salaried">Salaried</option>
+            <option value="Self Employed">Self Employed</option>
+          </select>
+        </div>
+        <div>
+          <label for="offerSort">Sort By</label>
+          <select id="offerSort">
+            <option value="emi">EMI (Low → High)</option>
+            <option value="rate">Rate (Low → High)</option>
+            <option value="fee">Processing Fee (Low → High)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="offersNote" class="dim" style="margin-top:8px;">Predict price to see personalized bank offers.</div>
+
+      <table class="table" aria-label="Bank offers">
+        <thead>
+          <tr>
+            <th>Bank</th>
+            <th>Product</th>
+            <th>Rate (% p.a.)</th>
+            <th>EMI</th>
+            <th>Tenure</th>
+            <th>Processing Fee</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="offersBody"></tbody>
+      </table>
+    </section>
+
+    <!-- Error -->
+    <section id="errorCard" class="card">
+      <h2><i class="fas fa-exclamation-triangle"></i> Error</h2>
+      <p id="errorText"></p>
+    </section>
+  </div>
+
+  <!-- Contact -->
+  <div class="wrapper">
+    <section id="contactCard" class="card">
+      <h2><i class="fas fa-handshake"></i> Consultation & Contact</h2>
+      <p class="muted" style="margin-top:-4px;">Book a free consultation. We’ll reach out within 24 hours.</p>
+
+      <div class="contact-grid">
+        <div class="contact-card" aria-label="Contact details">
+          <div class="contact-item"><i class="fas fa-phone"></i><div><div>Phone</div><a href="tel:+919074428080">+91 90744 28080</a></div></div>
+          <div class="contact-item"><i class="fab fa-whatsapp"></i><div><div>WhatsApp</div><a href="https://wa.me/919074428080?text=Hi%20I%27d%20like%20a%20property%20consultation" target="_blank" rel="noopener">Chat on WhatsApp</a></div></div>
+          <div class="contact-item"><i class="fas fa-envelope"></i><div><div>Email</div><a href="mailto:jaashi117@gmail.com">jaashi117@gmail.com</a></div></div>
+          <div class="contact-item"><i class="fas fa-location-dot"></i><div><div>Office</div><a href="https://maps.google.com/?q=Your%20Office%20Address" target="_blank" rel="noopener">Your Office Address, City</a><div class="muted">Mon–Sat: 10am–7pm</div></div></div>
+        </div>
+
+        <div>
+          <form id="contactForm" class="contact-card" autocomplete="off" aria-label="Consultation form">
+            <div class="row">
+              <div><label for="contactName">Full Name</label><input id="contactName" type="text" required placeholder="Your name"/></div>
+              <div><label for="contactEmail">Email</label><input id="contactEmail" type="email" required placeholder="name@email.com"/></div>
+            </div>
+            <div class="row">
+              <div><label for="contactPhone">Phone</label><input id="contactPhone" type="tel" required placeholder="+91 XXXXX XXXXX"/></div>
+              <div><label for="contactPurpose">Purpose</label><select id="contactPurpose" required>
+                <option value="Property Buying" selected>Property Buying</option>
+                <option value="Loan/EMI">Loan/EMI</option>
+                <option value="Sell/Lease">Sell/Lease</option>
+                <option value="Site Visit">Site Visit</option>
+                <option value="General">General</option>
+              </select></div>
+            </div>
+            <div class="row">
+              <div><label for="contactDate">Preferred Date</label><input id="contactDate" type="date"/></div>
+              <div><label for="contactTime">Preferred Time</label><input id="contactTime" type="time"/></div>
+            </div>
+            <div><label for="contactMessage">Message</label>
+              <textarea id="contactMessage" rows="4" placeholder="Tell us about your requirement (location, budget, timeline)…"></textarea>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+              <input id="contactConsent" type="checkbox" required/>
+              <label for="contactConsent" class="muted" style="margin:0;">I agree to be contacted on phone/email/WhatsApp.</label>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="cta" type="submit"><i class="fas fa-paper-plane"></i> Send Request</button>
+              <a class="cta" style="background:#10b981;" href="mailto:jaashi117@gmail.com?subject=Consultation%20Request&body=Hi%2C%20I%27d%20like%20a%20consultation."
+                 aria-label="Email us directly"><i class="fas fa-envelope-open-text"></i> Email Us</a>
+            </div>
+            <div id="contactStatus" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Parallax 3 -->
+  <section class="parallax" style="background-image:url('https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=2000&auto=format&fit=crop');">
+    <div class="p-content">
+      <h1>Plan Smarter, Invest Better</h1>
+      <p>Use EMI, duties, and bank offers to make the best decision.</p>
+      <a href="#inputCard"><button class="p-cta secondary"><i class="fas fa-rotate-left"></i> Start Over</button></a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2024 Propridict. All rights reserved. | <a href="#inputCard">Predict Prices</a> | <a href="#offersCard">Bank Offers</a> | <a href="#contactCard">Contact Us</a></p>
+    <p class="muted">Disclaimer: Rates are indicative estimates based on historical trends. Always verify with local authorities before making investment decisions.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
